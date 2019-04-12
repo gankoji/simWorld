@@ -1,0 +1,169 @@
+* TSE Sim and Algo Design - May 2018
+** Sim
+Overall design of this sim will be quite simple: There will be
+"targets" interspersed throughout an area, which a vehicle will be
+flying over with a camera and onboard software. The camera will
+receive information about the targets in its FPA coordinates. The
+onboard navigation software will have information about the vehicle's
+current attitude, along with the orientation of camera gimbal wrt the
+aircraft body. The overall Navigation capability should be able to
+deliver a DCM or quaternion to the TSE that can, along with an
+altitude and some assumptions about the flatness of the local area,
+transform target coordinates from camera FPA frame to the nav
+frame. From there, we can get lat/lon/alt.
+*** Vehicle
+I think the simplest way to go at first is to just hardcode or
+otherwise easily generate some search path, which the vehicle follows
+perfectly in time. Not quite sure how to generate this, and whether or
+not it would be easier to just *design a control/guidance system to
+follow it* versus some csv voodoo to generate it. 
+Can probably hardcode/constrain attitude to straight and level. 
+*** Search Area
+I think the search area will have to be defined a priori alongside the
+search path.
+*** Targets
+The targets should be randomly generated, with a truth position that
+comes from a monte carlo draw, and then we can either fuzz their
+reported position about the truth, or do the fuzzing in the sensor
+model, or both.
+** ESW
+*** Navigation
+The navigation should be capable of providing the basics: position,
+velocity, and attitude wrt a suitable reference frame (probably ECEF).
+We *could* go through the trouble of assembling those measurements
+from GPS, IMU and compass, but for now I think fuzzing truth
+measurements is probably a) easier and b) less straining on my sanity
+for the sake of the real problem here. This could be the beginning of
+a good testbed though. I spend some time developing some ESW for TSE,
+and then come back and muck with the nav a little bit, then start
+doing real dynamics and an autopilot and guidance, etc. 
+*** Guidance
+Literally just point the velocity vector along the path. 
+*** Control/Autopilot
+Literally just stick the nose to the velocity vector, wings level. 
+*** TSE
+This will be the fun one. This is where we're going to implement all
+the different filters (for now). 
+* Program Layout/Architecture
+My first reaction was to start with the EOM from previous sims. BUT,
+after some thought, I don't think that that's the way to go. I'm not
+going to need 6 DoF fidelity yet, so why not focus on other things? I
+feel that the 6 DoF sort of limits my thinking on the problem. 
+
+So what else then? Need to lay it out.
+
+For some reason, I'm seeing this from an external perspective. Like,
+an environment as the main class, with individual vehicle classes
+doing their own thing? 
+
+Is this too complicated a problem for the given task? Do I really care
+about all this for the sake of working on my KF chops? Maybe another
+problem is better suited to this task, that won't take quite so much
+damn sim code.
+
+I do think this particular problem is useful for GNC work, though, and
+I want to come back to it. I just don't want to do it right now!
+
+* Sim product storyboard/outline
+** TODO Basic Simulation
+*** TASK Outer sim loop
+<2019-03-11 Mon>
+
+Tonight, I'm going to try to work out at least a bare minimum
+simulation. My biggest tasks/decisions are figuring out state
+propagation/integration, storing data properly, and visualizing said
+data. 
+
+*** TASK Data logging primitives
+
+**** <2019-03-11 Mon> 
+
+ Well, I'm back to these notes after many months away (nearly a
+ year!). I think it would be interesting to try to incorporate the HDF5
+ data format into a simulation. This would be a great place to try it!
+
+ Above all, it's probably most important for me to start working on
+ offline data analysis as a default method. After last semester, I've
+ found that I spend entirely too much time running a simulation, just
+ to look at the plots afterward. Especially in cases where I'm mucking
+ with the post processing, I can be much more efficient by splitting up
+ the simulation and data processing into separate programs/scripts.
+
+ This brings up the broader question of separating/persisting
+ data. It's one thing to shorten the loop on post processing techniques
+ by storing all simulation outputs in a data file, that can then be
+ processed over and over again until the tweaks are finished on the
+ plots. It's quite another to be able to do the same sort of short loop
+ iterating on an ESW change. Especially for something open loop, like
+ an INS, being able to store off the IMU/GPS readings into a file and
+ then develop the nav algorithm in its own program is immensely
+ beneficial. Obviously, this is going to work with things like
+ autopilots or closed loop guidance laws, but it can also work for the
+ proposed TSE/tracker herein. I really need to start writing some of
+ this stuff. It's killing me that I haven't done anything on this topic
+ in so long.
+
+ Things that can be logged and later processed: IMU (Accel/Gyro/Mag),
+ GPS PR/DPR/Time, Gimbal State and detection FPA locations, ESW Nav
+ states, and probably quite a bit else. 
+
+**** <2019-03-13 Wed>
+
+ Looking at this a little more in depth, I think I'm going to use this
+ project as an excuse to expand my chops a bit and break out the
+ h5py/HDF5 interface and file format. From what I've read of it, it's
+ either become or becoming a defacto standard in the scientific
+ analysis scene as a way to store, retrieve, and share scientific
+ data. It cuts a beautiful middle ground between ease of use (like
+ text/csv files), feature richness (like RDBs), and compactness/speed
+ (like binary formats). 
+
+ My current issue is rethinking the whole architecure of how I've
+ written this stuff in the past: Individual classes in python which are
+ somewhat microservice-ish, each containing their own heterogeneous
+ data structures and needing a good bit of bookkeeping to get post
+ processing straight.
+
+ I'm thinking that it might be better to take state out of the classes
+ like ACS and EOM where the logic is. Maybe have some monolithic logger
+ class that keeps all the data straight? That seems inextensible,
+ especially as I look to add multiple vehicles and autonomous targets
+ and such. That said, so does keeping the state locked up in class
+ instances as well. There has to be a better way to architect all this,
+ and I think I need to drill down to requirements. 
+
+**** Requirements for data architecture
+
+State of the simulation should be easily interrogatable, during or
+after simulation runs. 
+
+State data shall be encapsulated at the entity level, to enable
+multiple entities to coexist at the same level in a simulation without
+conflicting the namespace. 
+
+Data post processing should be separate from the main simulation
+program. 
+
+To the maximal extent possible, data heirarchy and organization should
+be homogeneous, to facilitate reuse of plotting and post processing
+routines on multiple data sets. This includes parity between truth and
+estimated/measured quantities. 
+
+*** TASK Vehicle motion
+*** TASK Search area definition
+*** TASK Path generation
+*** TASK Target placement/draws
+*** TASK Camera/Sensor
+** TODO Basic ESW
+*** TASK Navigation
+*** TASK TSE
+*** TASK Autopilot
+*** TASK Guidance
+** TODO Advanced Algorithm Development
+*** TASK SO(3) pointing autopilot
+*** TASK SE(3) guidance algorithm
+*** TASK Tracking algorithms
+Here, I specifically want to look at the interactions between GNC
+algorithm performance and tracking performance. How can AP/guidnace
+design impact the tracker negatively? Are there ways that it can
+impact it positively?
