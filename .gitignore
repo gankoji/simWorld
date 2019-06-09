@@ -105,8 +105,9 @@ venv.bak/
 
 # Additional Ignores
 *~
-/ActualData.hdf5
 /.idea/libraries/R_User_Library.xml
 /.idea/misc.xml
 /.idea/modules.xml
+.idea*
+.idea/*
 *.hdf5
