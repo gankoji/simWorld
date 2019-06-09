@@ -109,3 +109,4 @@ venv.bak/
 /.idea/libraries/R_User_Library.xml
 /.idea/misc.xml
 /.idea/modules.xml
+*.hdf5

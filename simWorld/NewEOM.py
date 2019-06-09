@@ -15,8 +15,9 @@ class eom:
         # Velocity                                          3 [3:6]
         # Attitude (Body to Inertial)                       9 [12:21]
         # Angular Rates (Body wrt Inertial, in body)        3 [21:24]
-        # Total Elements:                                   18
-        self.dataFrameLength = 18
+        # Time (s)
+        # Total Elements:                                   19
+        self.dataFrameLength = 19
         self.data = np.zeros((self.simLength, self.dataFrameLength))
         self.derivatives = np.zeros((self.dataFrameLength,))
         self.time = np.linspace(0, end_time, self.simLength)
@@ -26,10 +27,12 @@ class eom:
         self.vel = slice(3,6)
         self.dcm = slice(6,15)
         self.rat = slice(15,18)
+        self.time = 18
 
         self.dataIndex = 0
         self.data[self.dataIndex, :] = initialState
         self.dt = dt
+        self.prevTime = 0.0
 
     def getInputs(self, forces, moments, mass, inertia):
         # Forces is a 1x3 vector (XYZ)
@@ -68,6 +71,8 @@ class eom:
         currentDCM = np.resize(self.data[nc, self.dcm], (3,3))
         currentDCM = self.gsOrtho(currentDCM)
         self.data[nc, self.dcm] = np.resize(currentDCM, (9,))
+        self.prevTime = self.prevTime + self.dt
+        self.data[nc, self.time] = self.prevTime
         self.dataIndex += 1
 
     def updateDerivatives(self, state):

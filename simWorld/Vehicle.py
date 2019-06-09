@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import random
 
 import NewEOM
 import Aerodynamics
@@ -9,7 +10,7 @@ class Vehicle:
 
     def __init__(self, dt, end):
         initialDCM = np.resize(np.eye(3),(9,))
-        initialState = np.zeros((18,))
+        initialState = np.zeros((19,))
         initialState[6:15] = initialDCM
         initialState[0:3] = np.array([6300000,0,0])
         
@@ -20,8 +21,8 @@ class Vehicle:
         self.simLength = self.eom.simLength
 
     def update(self):
-        rho = 1.475
-        V = 50
+        rho = 1.475*np.random.normal()
+        V = 50*np.random.normal()
         throttle = 1
         deflect = np.array([0, 0.1, 1])
         C_w_b = np.eye(3)
