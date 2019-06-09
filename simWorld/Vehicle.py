@@ -38,7 +38,7 @@ class Vehicle:
         m, J = self.getMassProps()
 
         self.eom.getInputs(f_total, m_total, m, J)
-        print(self.eom.getOutputs())
+        self.eom.getOutputs()
 
     def getMassProps(self):
         return 1, np.eye(3)
