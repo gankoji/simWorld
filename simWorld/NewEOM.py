@@ -36,8 +36,6 @@ class eom:
 
     def velMag(self):
         vm = np.linalg.norm(self.data[self.dataIndex, self.vel])
-        print(vm)
-        print(self.data[self.dataIndex, self.vel])
         return vm
     
     def getInputs(self, forces, moments, mass, inertia):

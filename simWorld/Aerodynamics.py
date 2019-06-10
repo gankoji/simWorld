@@ -22,10 +22,10 @@ class Aerodynamics:
         Cs = self.getSlip(beta)
         lift = 0.5*rho*self.Al*Cl*(V**2)
         drag = 0.5*rho*self.Al*Cd*(V**2)
+        drag = 0.0
         slip = 0.5*rho*self.Al*Cs*(V**2)
 
         forces = np.array([-drag, -lift, slip])
-        print("Forces: " + str(forces))
         return forces
 
     def getMoments(self, rho, V, C_w_b, deflect):
