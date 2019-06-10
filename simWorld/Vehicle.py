@@ -12,7 +12,8 @@ class Vehicle:
         initialDCM = np.resize(np.eye(3),(9,))
         initialState = np.zeros((19,))
         initialState[6:15] = initialDCM
-        initialState[0:3] = np.array([6300000,0,0])
+        initialState[0:3] = np.array([6300000,100000,1000000])
+        initialState[3:6] = np.array([50, 1, 0])
         
         self.eom = NewEOM.eom(dt, end, initialState)
         self.aero = Aerodynamics.Aerodynamics()
@@ -21,10 +22,10 @@ class Vehicle:
         self.simLength = self.eom.simLength
 
     def update(self):
-        rho = 1.475*np.random.normal()
-        V = 50*np.random.normal()
-        throttle = 1
-        deflect = np.array([0, 0.1, 1])
+        rho = 1.475 - 0.4*np.random.normal()
+        V = self.eom.velMag()
+        throttle = 0
+        deflect = np.array([0, 0, 0])
         C_w_b = np.eye(3)
         
         f_aero = self.aero.getForces(rho, V, C_w_b)

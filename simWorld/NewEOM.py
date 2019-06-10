@@ -34,6 +34,12 @@ class eom:
         self.dt = dt
         self.prevTime = 0.0
 
+    def velMag(self):
+        vm = np.linalg.norm(self.data[self.dataIndex, self.vel])
+        print(vm)
+        print(self.data[self.dataIndex, self.vel])
+        return vm
+    
     def getInputs(self, forces, moments, mass, inertia):
         # Forces is a 1x3 vector (XYZ)
         # expected in body frame

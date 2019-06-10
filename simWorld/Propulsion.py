@@ -3,10 +3,13 @@ import math
 
 class Propulsion:
     def __init__(self):
-        self.Tmax = 500 # Newtons
-        
+        self.Tmax = 0.05 # Newtons
+        self.Vmax = 150
     def getForces(self, rho, V, throttle):
         thrust = throttle*self.Tmax
+        if V > self.Vmax:
+            thrust = 0.0
+
         return np.array([thrust, 0, 0])
 
     def getMoments(self, rho, V, throttle):
