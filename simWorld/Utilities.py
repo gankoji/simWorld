@@ -188,3 +188,32 @@ def Quat2AxisAngle(q):
 
     beta = np.append([theta], e, axis=0)
     return beta
+
+def gs_cofficient(v1, v2):
+    return np.dot(v2, v1) / np.dot(v1, v1)
+
+def multiply(coefficient, v):
+    return coefficient*v
+
+def proj(v1, v2):
+    return multiply(gs_cofficient(v1, v2) , v1)
+
+def gs(X):
+    ## We only do the 3 dimensional case here
+    u1 = X[0,:]
+    u2 = X[1,:]
+    u3 = X[2,:]
+    v1 = X[0,:]
+    v2 = (u2 - (np.dot(u2, v1)/np.linalg.norm(v1))*v1)
+    v3 = (u3 - (np.dot(u3, v1)/np.linalg.norm(v1))*v1 
+          - (np.dot(u3, v2)/np.linalg.norm(v2))*v2)
+    
+    v1 = v1/np.linalg.norm(v1)
+    v2 = v2/np.linalg.norm(v2)
+    v3 = v3/np.linalg.norm(v3)
+    
+    Y = np.array([v1,
+                  v2,
+                  v3])
+    
+    return Y
