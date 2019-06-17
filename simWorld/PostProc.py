@@ -1,6 +1,15 @@
 import h5py
-from pylab import *
+#from pylab import *
+import matplotlib.pyplot as plt
 import numpy as np
+
+plotAlt = True
+plotRm = True
+plotRI = True
+
+plotVm = True
+plotVI = True
+plotVB = True
 
 fileName = "Base.hdf5"
 
@@ -10,14 +19,62 @@ f = h5py.File(fileName, "r",
 for x in f.keys():
     for run in f[x].keys():
         dset = f[x][run]['VehicleData']
+
+        if plotRm:
+            ## Altitude
+            fig, ax = plt.subplots()
+            ax.plot(dset[:,18], (np.linalg.norm(dset[:,0:3], axis=1) - 6.371e6))
+            plt.title('Spherical Altitude')
+            plt.ylabel('Altitude (m)')
+            plt.xlabel('Time (s)')
+            
+        if plotRm:
+            ## Position Magnitude
+            fig, ax = plt.subplots()
+            ax.plot(dset[:,18], np.linalg.norm(dset[:,0:3], axis=1))
+            plt.title('Position Magnitude')
+            plt.ylabel('Position (m)')
+            plt.xlabel('Time (s)')
+            
+        if plotRI:
+            ## Inertial Positions
+            fig = plt.figure()
+            plt.subplot(311)
+            plt.title('ECI Positions')
+            plt.ylabel('Position (m)')
+            plt.plot(dset[:,18], dset[:,0])
+
+            plt.subplot(312)
+            plt.ylabel('Position (m)')
+            plt.plot(dset[:,18], dset[:,1])
+
+            plt.subplot(313)
+            plt.ylabel('Position (m)')
+            plt.plot(dset[:,18], dset[:,2])
+            plt.xlabel('Time (s)')
+            
+        if plotVm:
+            fig, ax = plt.subplots()
+            ax.plot(dset[:,18], np.linalg.norm(dset[:,3:6], axis=1))
+            plt.title('Velocity Magnitude')
+            plt.ylabel('Velocity (m/s)')
+            plt.xlabel('Time (s)')
         
-        subplot(1,1,1)
-        plot(dset[:,18], np.linalg.norm(dset[:,3:5], axis=1))
-        
-        # subplot(3,1,2)
-        # plot(dset[:,18], dset[:,4])
-        
-        # subplot(3,1,3)
-        # plot(dset[:,18], dset[:,5])
+        if plotVI:
+            ## Inertial Velocities
+            fig = plt.figure()
+            plt.subplot(311)
+            plt.title('ECI Velocities')
+            plt.ylabel('Velocity (m/s)')
+            plt.plot(dset[:,18], dset[:,3])
+
+            plt.subplot(312)
+            plt.ylabel('Velocity (m/s)')
+            plt.plot(dset[:,18], dset[:,4])
+
+            plt.subplot(313)
+            plt.ylabel('Velocity (m/s)')
+            plt.plot(dset[:,18], dset[:,5])
+            plt.xlabel('Time (s)')
         
 plt.show()

@@ -33,14 +33,11 @@ class Vehicle:
             self.throttle = 1.0
         elif self.throttle <= 0.0:
             self.throttle = 0.0
-            
-        #self.throttle = 0.0
-        
+
         deflect = np.array([0, 0, 0])
         C_w_b = self.eom.getWindToBody()
         
         f_aero = self.aero.getForces(rho, V, C_w_b)
-
         f_prop = self.prop.getForces(rho, V, self.throttle)
 
         m_aero = self.aero.getMoments(rho, V, C_w_b, deflect)
