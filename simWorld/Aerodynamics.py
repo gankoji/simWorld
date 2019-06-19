@@ -24,9 +24,7 @@ class Aerodynamics:
     def getForces(self, rho, Vb):
       
         V = np.linalg.norm(Vb)
-        #alpha = math.asin(-C_w_b[2,0])
         alpha = math.atan2(Vb[0],Vb[2])
-        #beta = math.asin(C_w_b[0,1])
         beta = math.atan2(Vb[0],Vb[1])
 
         Cl = self.getLift(alpha)
@@ -51,8 +49,8 @@ class Aerodynamics:
             
         return forces
 
-    def getMoments(self, rho, V, C_w_b, deflect):
-        V = V*C_w_b[0,0]
+    def getMoments(self, rho, Vb, deflect):
+        V = np.linalg.norm(Vb)
         rVfrac = rho*V/self.rVmax
 
         L = rVfrac*(deflect[0]**3)*self.Lmax

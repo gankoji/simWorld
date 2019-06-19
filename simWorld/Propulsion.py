@@ -3,7 +3,7 @@ import math
 
 class Propulsion:
     def __init__(self):
-        self.Tmax = 25 # Newtons
+        self.Tmax = 2.5 # Newtons
         self.Vmax = 150
     def getForces(self, rho, V, throttle):
         thrust = throttle*self.Tmax

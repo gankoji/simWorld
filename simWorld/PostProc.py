@@ -11,6 +11,8 @@ plotVm = True
 plotVI = True
 plotVB = True
 
+plotAtt = True
+
 fileName = "Base.hdf5"
 
 f = h5py.File(fileName, "r",
@@ -88,4 +90,23 @@ if plotVI:
             plt.plot(dset[:,18], dset[:,5])
             plt.xlabel('Time (s)')
         
+if plotAtt:
+    ## Inertial Attitude
+    fig = plt.figure()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
+            plt.subplot(311)
+            plt.title('Body to ECI DCM - Row 1')
+            plt.ylabel('Matrix Element')
+            plt.plot(dset[:,18], dset[:,6:9])
+
+            plt.subplot(312)
+            plt.ylabel('Matrix Element')
+            plt.plot(dset[:,18], dset[:,9:12])
+
+            plt.subplot(313)
+            plt.ylabel('Matrix Element')
+            plt.plot(dset[:,18], dset[:,12:15])
+            plt.xlabel('Time (s)')
 plt.show()

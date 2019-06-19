@@ -8,6 +8,22 @@ import Propulsion
 
 debugVehicle = False
 
+def biClamp(val, lim):
+    if val >= lim:
+        val = lim
+    elif val <= -lim:
+        val = -lim
+        
+    return val
+
+def clamp(val, lim):
+    if val >= lim:
+        val = lim
+    elif val <= 0.0:
+        val = 0.0
+        
+    return val
+
 class Vehicle:
 
     def __init__(self, dt, end):
@@ -28,23 +44,19 @@ class Vehicle:
         rho = 1.475 #- 0.4*np.random.normal()
         V = self.eom.velMag()
 
-        self.throttle = 3*(self.Vset - V)
-        if self.throttle >= 1.0:
-            self.throttle = 1.0
-        elif self.throttle <= 0.0:
-            self.throttle = 0.0
-
-        self.throttle = 0.0
-        deflect = np.array([0, 0, 0])
         C_w_b = self.eom.getWindToBody()
         
         C_b_i = self.eom.data[self.eom.dataIndex, self.eom.dcm]
         C_i_b = np.resize(C_b_i,(3,3)).transpose()
         Vb = np.dot(C_i_b, self.eom.data[self.eom.dataIndex, self.eom.vel])
+        
+        self.autothrottle(Vb)
+        self.autopilot(Vb)
+        
         f_aero = self.aero.getForces(rho, Vb)
         f_prop = self.prop.getForces(rho, V, self.throttle)
 
-        m_aero = self.aero.getMoments(rho, V, C_w_b, deflect)
+        m_aero = self.aero.getMoments(rho, Vb, self.deflect)
         m_prop = self.prop.getMoments(rho, V, self.throttle)
 
         f_total = f_aero + f_prop
@@ -61,5 +73,22 @@ class Vehicle:
             print("Total Forces (Body): "
                   + str(f_total))
 
+    def autothrottle(self, Vb):
+        V = np.linalg.norm(Vb)
+        self.throttle = 1.0*(self.Vset - V)
+        clamp(self.throttle, 1.0)
+
+        #self.throttle = 0.0
+        
+    def autopilot(self, Vb):
+        V = np.linalg.norm(Vb)
+        alpha = math.atan2(Vb[0],Vb[2])
+        beta = math.atan2(Vb[0],Vb[1])
+        
+        self.deflect = np.array([0.0, 0.0, 0.0])
+        
+        self.deflect[1] = -0.05*alpha
+        self.deflect[2] = -0.05*beta
+        
     def getMassProps(self):
         return 1, np.eye(3)
