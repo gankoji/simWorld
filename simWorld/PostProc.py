@@ -16,29 +16,34 @@ fileName = "Base.hdf5"
 f = h5py.File(fileName, "r",
               driver="core", backing_store=True)
 
-for x in f.keys():
-    for run in f[x].keys():
-        dset = f[x][run]['VehicleData']
-
-        if plotRm:
-            ## Altitude
-            fig, ax = plt.subplots()
+if plotRm:
+    ## Altitude
+    fig, ax = plt.subplots()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
             ax.plot(dset[:,18], (np.linalg.norm(dset[:,0:3], axis=1) - 6.371e6))
-            plt.title('Spherical Altitude')
-            plt.ylabel('Altitude (m)')
-            plt.xlabel('Time (s)')
-            
-        if plotRm:
-            ## Position Magnitude
-            fig, ax = plt.subplots()
+    plt.title('Spherical Altitude')
+    plt.ylabel('Altitude (m)')
+    plt.xlabel('Time (s)')
+
+if plotRm:
+    ## Position Magnitude
+    fig, ax = plt.subplots()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
             ax.plot(dset[:,18], np.linalg.norm(dset[:,0:3], axis=1))
-            plt.title('Position Magnitude')
-            plt.ylabel('Position (m)')
-            plt.xlabel('Time (s)')
-            
-        if plotRI:
-            ## Inertial Positions
-            fig = plt.figure()
+    plt.title('Position Magnitude')
+    plt.ylabel('Position (m)')
+    plt.xlabel('Time (s)')
+
+if plotRI:
+    ## Inertial Positions
+    fig = plt.figure()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
             plt.subplot(311)
             plt.title('ECI Positions')
             plt.ylabel('Position (m)')
@@ -52,17 +57,23 @@ for x in f.keys():
             plt.ylabel('Position (m)')
             plt.plot(dset[:,18], dset[:,2])
             plt.xlabel('Time (s)')
-            
-        if plotVm:
-            fig, ax = plt.subplots()
+
+if plotVm:
+    fig, ax = plt.subplots()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
             ax.plot(dset[:,18], np.linalg.norm(dset[:,3:6], axis=1))
-            plt.title('Velocity Magnitude')
-            plt.ylabel('Velocity (m/s)')
-            plt.xlabel('Time (s)')
-        
-        if plotVI:
-            ## Inertial Velocities
-            fig = plt.figure()
+    plt.title('Velocity Magnitude')
+    plt.ylabel('Velocity (m/s)')
+    plt.xlabel('Time (s)')
+
+if plotVI:
+    ## Inertial Velocities
+    fig = plt.figure()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
             plt.subplot(311)
             plt.title('ECI Velocities')
             plt.ylabel('Velocity (m/s)')

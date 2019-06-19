@@ -14,8 +14,8 @@ class Vehicle:
         initialDCM = np.resize(np.eye(3),(9,))
         initialState = np.zeros((19,))
         initialState[6:15] = initialDCM
-        initialState[0:3] = np.array([100000,6300000,1000000])
-        initialState[3:6] = np.array([15, 0, 0])
+        initialState[0:3] = np.array([100000,6300000,1000000]) + 1e3*np.random.randn(3)
+        initialState[3:6] = np.array([15, 0, 0]) + 10.0*np.random.randn(3)
         
         self.eom = NewEOM.eom(dt, end, initialState)
         self.aero = Aerodynamics.Aerodynamics()
@@ -34,10 +34,14 @@ class Vehicle:
         elif self.throttle <= 0.0:
             self.throttle = 0.0
 
+        self.throttle = 0.0
         deflect = np.array([0, 0, 0])
         C_w_b = self.eom.getWindToBody()
         
-        f_aero = self.aero.getForces(rho, V, C_w_b)
+        C_b_i = self.eom.data[self.eom.dataIndex, self.eom.dcm]
+        C_i_b = np.resize(C_b_i,(3,3)).transpose()
+        Vb = np.dot(C_i_b, self.eom.data[self.eom.dataIndex, self.eom.vel])
+        f_aero = self.aero.getForces(rho, Vb)
         f_prop = self.prop.getForces(rho, V, self.throttle)
 
         m_aero = self.aero.getMoments(rho, V, C_w_b, deflect)

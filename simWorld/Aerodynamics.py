@@ -4,19 +4,30 @@ import math
 debugAero = False
 class Aerodynamics:
     def __init__(self):
-        self.Cl = 1
-        self.Cd = 0.005
         self.Al = 1
         self.Ad = 1
         self.Lmax = 3
         self.Mmax = 3
         self.Nmax = 3
         self.rVmax = 1.475*150
+        self.gain = np.zeros((3,))
+        self.bias = np.zeros((3,))
+        
+        self.gain[0] = 0.10 + 0.010*np.random.randn()
+        self.gain[1] = 0.05 + 0.001*np.random.randn()
+        self.gain[2] = 0.05 + 0.001*np.random.randn()
+        
+        self.bias[0] = 0.05 + 0.01*np.random.randn()
+        self.bias[1] = 0.10 + 0.100*np.random.randn()
+        self.bias[2] = 0.10 + 0.100*np.random.randn()
 
-    def getForces(self, rho, V, C_w_b):
+    def getForces(self, rho, Vb):
       
-        alpha = math.asin(-C_w_b[2,0])
-        beta = math.asin(C_w_b[0,1])
+        V = np.linalg.norm(Vb)
+        #alpha = math.asin(-C_w_b[2,0])
+        alpha = math.atan2(Vb[0],Vb[2])
+        #beta = math.asin(C_w_b[0,1])
+        beta = math.atan2(Vb[0],Vb[1])
 
         Cl = self.getLift(alpha)
         Cd = self.getDrag(alpha)
@@ -25,9 +36,9 @@ class Aerodynamics:
         drag = 0.5*rho*self.Al*Cd*(V**2)
         slip = 0.5*rho*self.Al*Cs*(V**2)
 
-        dragSign = -np.sign(C_w_b[0,0])
-        slipSign = -np.sign(C_w_b[1,1])
-        liftSign = np.sign(C_w_b[2,2])
+        dragSign = -np.sign(Vb[0])
+        slipSign = -np.sign(Vb[1])
+        liftSign = -np.sign(Vb[2])
         forces = np.array([drag*dragSign, slip*slipSign, lift*liftSign])
         
         if debugAero:
@@ -36,6 +47,7 @@ class Aerodynamics:
             print("V: " + str(V))
             print("rhoV2: " + str(rho*V**2))
             print("Aero Forces Mag: " + str(np.linalg.norm(forces)))
+            print("Ratio: " + str(np.linalg.norm(forces)/(rho*V**2)))
             
         return forces
 
@@ -50,16 +62,28 @@ class Aerodynamics:
         return np.array([L,M,N])
     
     def getLift(self, alpha):
-        Cl = 0.1*alpha + 0.15
+        Cl = self.gain[0]*alpha + self.bias[0]
+        if Cl >= 0.45:
+            Cl = 0.45
+        elif Cl <= -0.45:
+            Cl = -0.45
 
         return Cl
 
     def getDrag(self, alpha):
-        Cd = 0.05*math.fabs(alpha) + 0.01
-
+        Cd = self.gain[1]*math.fabs(alpha) + self.bias[1]
+        if Cd >= 0.99:
+            Cd = 0.99
+        elif Cd <= 0.0:
+            Cd = 0.0
+            
         return Cd
 
     def getSlip(self, beta):
-        Cs = 0.05*math.fabs(beta)
-
+        Cs = self.gain[2]*math.fabs(beta) + self.bias[2]
+        if Cs >= 0.99:
+            Cs = 0.99
+        elif Cs <= 0.0:
+            Cs = 0.0
+            
         return Cs

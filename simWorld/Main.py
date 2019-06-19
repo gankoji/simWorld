@@ -7,7 +7,7 @@ import Vehicle
 
 
 scenario = "Base"
-numRuns = 1
+numRuns = 10
 fileName = scenario + ".hdf5"
 if os.path.exists(fileName):
     os.remove(fileName)
@@ -19,7 +19,7 @@ scenario = "/" + scenario
 
 for j in range(0, numRuns):
     nodeName = scenario + "/" + str(j) + "/VehicleData"
-    vehicle = Vehicle.Vehicle(0.01, 6.6)
+    vehicle = Vehicle.Vehicle(0.01, 18)
     for i in range(0, vehicle.simLength-1):
         vehicle.update()
 
