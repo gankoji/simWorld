@@ -81,7 +81,7 @@ I'll be attempting to roll out will look something like this:
 Vehicle Components
 - EOM (DONE)
 - Dynamics (DONE)
-- Aero (50%)
+- Aero (90%)
 - Propulsion (50%)
 - Power/Fuel Systems
 - Mass Properties (25%)

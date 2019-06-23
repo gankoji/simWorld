@@ -36,7 +36,6 @@ class Vehicle:
         
         self.eom = NewEOM.eom(dt, end, initialState)
         self.aero = Aerodynamics.Aerodynamics()
-        #self.aero = AeroSurface.AeroSurface()
         self.prop = Propulsion.Propulsion()
         self.throttle = 0.25
         self.Vset = 15
@@ -55,10 +54,11 @@ class Vehicle:
         self.autothrottle(Vb)
         self.autopilot(Vb)
         
-        f_aero = self.aero.getForces(rho, Vb)
+        w = self.eom.data[self.eom.dataIndex, 15:18]
+        f_aero = self.aero.getForces(rho, Vb, w)
         f_prop = self.prop.getForces(rho, Vb, self.throttle)
 
-        m_aero = self.aero.getMoments(rho, Vb, self.deflect)
+        m_aero = self.aero.getMoments(rho, Vb, w, self.deflect)
         m_prop = self.prop.getMoments(rho, Vb, self.throttle)
 
         f_total = f_aero + f_prop
