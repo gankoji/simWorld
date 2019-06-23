@@ -20,17 +20,18 @@ def clamp(val, lim):
     return val
 
 class AeroSurface:
-    def __init__(self):
-        self.Al = 2
-        self.Ad = 1
+    def __init__(self, Al, C_a_b, r_a):
+        self.Al = Al
         
         self.aTable  = np.array([-180,-90,-60,-45,-30,-15,-10,-5,
                                  0,5,10,15,30,45,60,90,180])
         self.ClTable = np.array([   0.5,0.00,-0.01,-0.1,-.025,-0.95, -0.75, -0.6,
                                     0,0.5,0.75, 0.99,0.5,0.25,0.01,0.0, -0.5]) 
-        self.CdTable = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 0.1, 0.05, 0.025,
-                                 0.01, 0.025, 0.05, 0.1, 1.0, 1.0, 1.0, 1.0, 1.0])
+        self.CdTable = np.array([0.01, 1.0, 0.8, 0.75, 0.5, 0.1, 0.05, 0.025,
+                                 0.01, 0.025, 0.05, 0.1, 0.5, 0.75, 0.8, 1.0, 0.01])
         self.aTable = self.aTable*math.pi/180.0
+        self.C_a_b = C_a_b
+        self.r_a = r_a
 
     def getForces(self, rho, Vb):
       
@@ -65,9 +66,9 @@ class AeroSurface:
 
     def getMoments(self, rho, Vb, deflect):
         V = np.linalg.norm(Vb)
-        rVfrac = rho*V/120.0
+        rVfrac = rho*V/20.0
 
-        L = rVfrac*(deflect[0]**3)*1.0
+        L = rVfrac*(deflect[0]**3)*10.0
         M = rVfrac*(deflect[1]**3)*1.0
         N = rVfrac*(deflect[2]**3)*1.0
 
@@ -84,3 +85,9 @@ class AeroSurface:
     def getSlip(self, beta):
         Cs = np.interp(beta, self.aTable, self.CdTable)
         return Cs
+
+    def getRotToBody(self):
+        return self.C_a_b
+    
+    def getDispToBody(self):
+        return self.r_a

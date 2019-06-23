@@ -109,4 +109,23 @@ if plotAtt:
             plt.ylabel('Matrix Element')
             plt.plot(dset[:,18], dset[:,12:15])
             plt.xlabel('Time (s)')
+            
+    ## Body Rates
+    fig = plt.figure()
+    for x in f.keys():
+        for run in f[x].keys():
+            dset = f[x][run]['VehicleData']
+            plt.subplot(311)
+            plt.title('Body Rates')
+            plt.ylabel('rad/s')
+            plt.plot(dset[:,18], dset[:,15])
+
+            plt.subplot(312)
+            plt.ylabel('rad/s')
+            plt.plot(dset[:,18], dset[:,16])
+
+            plt.subplot(313)
+            plt.ylabel('rad/s')
+            plt.plot(dset[:,18], dset[:,17])
+            plt.xlabel('Time (s)')
 plt.show()

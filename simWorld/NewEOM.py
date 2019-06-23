@@ -15,8 +15,8 @@ class eom:
 
         # Position (Inertial)                               3 [0:3]
         # Velocity                                          3 [3:6]
-        # Attitude (Body to Inertial)                       9 [12:21]
-        # Angular Rates (Body wrt Inertial, in body)        3 [21:24]
+        # Attitude (Body to Inertial)                       9 [6:15]
+        # Angular Rates (Body wrt Inertial, in body)        3 [15:18]
         # Time (s)
         # Total Elements:                                   19
         self.dataFrameLength = 19

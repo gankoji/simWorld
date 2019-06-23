@@ -82,7 +82,7 @@ Vehicle Components
 - EOM (DONE)
 - Dynamics (DONE)
 - Aero (50%)
-- Propulsion (25%)
+- Propulsion (50%)
 - Power/Fuel Systems
 - Mass Properties (25%)
 - Payloads
