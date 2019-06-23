@@ -21,27 +21,16 @@ def clamp(val, lim):
 
 class AeroSurface:
     def __init__(self):
-        self.Al = 1
+        self.Al = 2
         self.Ad = 1
         
         self.aTable  = np.array([-180,-90,-60,-45,-30,-15,-10,-5,
                                  0,5,10,15,30,45,60,90,180])
-        self.ClTable = np.array([   0,  0,  0,  0,  0,-0.95, -0.75, -0.6,
-                                    0,0.5,0.75, 0.99, 0, 0, 0, 0, 0]) 
+        self.ClTable = np.array([   0.5,0.00,-0.01,-0.1,-.025,-0.95, -0.75, -0.6,
+                                    0,0.5,0.75, 0.99,0.5,0.25,0.01,0.0, -0.5]) 
         self.CdTable = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 0.1, 0.05, 0.025,
                                  0.01, 0.025, 0.05, 0.1, 1.0, 1.0, 1.0, 1.0, 1.0])
         self.aTable = self.aTable*math.pi/180.0
-                                    
-        self.gain = np.zeros((3,))
-        self.bias = np.zeros((3,))
-        
-        self.gain[0] = 0.10 + 0.010*np.random.randn()
-        self.gain[1] = 0.05 + 0.001*np.random.randn()
-        self.gain[2] = 0.05 + 0.001*np.random.randn()
-        
-        self.bias[0] = 0.05 + 0.01*np.random.randn()
-        self.bias[1] = 0.10 + 0.100*np.random.randn()
-        self.bias[2] = 0.10 + 0.100*np.random.randn()
 
     def getForces(self, rho, Vb):
       
@@ -93,7 +82,5 @@ class AeroSurface:
         return Cd
 
     def getSlip(self, beta):
-        Cs = self.gain[2]*math.fabs(beta) + self.bias[2]
-        Cs = clamp(Cs, 0.99)
-            
+        Cs = np.interp(beta, self.aTable, self.CdTable)
         return Cs

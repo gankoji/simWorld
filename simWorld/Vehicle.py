@@ -54,10 +54,9 @@ class Vehicle:
         
         self.autothrottle(Vb)
         self.autopilot(Vb)
-        #self.throttle = 0.0
         
         f_aero = self.aero.getForces(rho, Vb)
-        f_prop = self.prop.getForces(rho, V, self.throttle)
+        f_prop = self.prop.getForces(rho, Vb, self.throttle)
 
         m_aero = self.aero.getMoments(rho, Vb, self.deflect)
         m_prop = self.prop.getMoments(rho, V, self.throttle)
@@ -94,4 +93,4 @@ class Vehicle:
         self.deflect[2] = -0.05*beta
         
     def getMassProps(self):
-        return 1, np.eye(3)
+        return 10, np.eye(3)

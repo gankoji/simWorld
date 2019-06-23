@@ -7,9 +7,9 @@ import Vehicle
 
 
 scenario = "Base"
-numRuns = 1
-dt = .0001
-endTime = 10
+numRuns = 10
+dt = .005
+endTime = 50
 fileName = scenario + ".hdf5"
 if os.path.exists(fileName):
     os.remove(fileName)
