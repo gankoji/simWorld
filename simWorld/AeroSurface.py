@@ -19,14 +19,19 @@ def clamp(val, lim):
         
     return val
 
-class Aerodynamics:
+class AeroSurface:
     def __init__(self):
         self.Al = 1
         self.Ad = 1
-        self.Lmax = 3
-        self.Mmax = 3
-        self.Nmax = 3
-        self.rVmax = 1.475*150
+        
+        self.aTable  = np.array([-180,-90,-60,-45,-30,-15,-10,-5,
+                                 0,5,10,15,30,45,60,90,180])
+        self.ClTable = np.array([   0,  0,  0,  0,  0,-0.95, -0.75, -0.6,
+                                    0,0.5,0.75, 0.99, 0, 0, 0, 0, 0]) 
+        self.CdTable = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 0.1, 0.05, 0.025,
+                                 0.01, 0.025, 0.05, 0.1, 1.0, 1.0, 1.0, 1.0, 1.0])
+        self.aTable = self.aTable*math.pi/180.0
+                                    
         self.gain = np.zeros((3,))
         self.bias = np.zeros((3,))
         
@@ -41,8 +46,8 @@ class Aerodynamics:
     def getForces(self, rho, Vb):
       
         V = np.linalg.norm(Vb)
-        alpha = math.atan2(Vb[0],Vb[2])
-        beta = math.atan2(Vb[0],Vb[1])
+        alpha = math.atan2(Vb[2],Vb[0])
+        beta = math.atan2(Vb[1],Vb[0])
 
         Cl = self.getLift(alpha)
         Cd = self.getDrag(alpha)
@@ -57,35 +62,34 @@ class Aerodynamics:
         slipSign = -np.sign(Vb[1])
         liftSign = -np.sign(Vb[2])
         forces = np.array([drag*dragSign, slip*slipSign, lift*liftSign])
-        
+
         if debugAero:
             print("Alpha: " + str(alpha))
             print("Beta: " + str(beta))
-            print("V: " + str(V))
+            print("Vb: " + str(Vb))
+            print("Forces: " + str(forces))
             print("rhoV2: " + str(rho*V**2))
             print("Aero Forces Mag: " + str(np.linalg.norm(forces)))
             print("Ratio: " + str(np.linalg.norm(forces)/(rho*V**2)))
-            
+            print("ForceDot: " + str(np.dot(Vb, forces)/V/np.linalg.norm(forces)))    
         return forces
 
     def getMoments(self, rho, Vb, deflect):
         V = np.linalg.norm(Vb)
-        rVfrac = rho*V/self.rVmax
+        rVfrac = rho*V/120.0
 
-        L = rVfrac*(deflect[0]**3)*self.Lmax
-        M = rVfrac*(deflect[1]**3)*self.Mmax
-        N = rVfrac*(deflect[2]**3)*self.Nmax
+        L = rVfrac*(deflect[0]**3)*1.0
+        M = rVfrac*(deflect[1]**3)*1.0
+        N = rVfrac*(deflect[2]**3)*1.0
 
         return np.array([L,M,N])
     
     def getLift(self, alpha):
-        Cl = self.gain[0]*alpha + self.bias[0]
-        Cl = biClamp(Cl, 0.45)
+        Cl = np.interp(alpha, self.aTable, self.ClTable)
         return Cl
 
     def getDrag(self, alpha):
-        Cd = self.gain[1]*math.fabs(alpha) + self.bias[1]
-        Cd = clamp(Cd, 0.99)
+        Cd = np.interp(alpha, self.aTable, self.CdTable)
         return Cd
 
     def getSlip(self, beta):

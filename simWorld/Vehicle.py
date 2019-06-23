@@ -4,6 +4,7 @@ import random
 
 import NewEOM
 import Aerodynamics
+import AeroSurface
 import Propulsion
 
 debugVehicle = False
@@ -34,7 +35,8 @@ class Vehicle:
         initialState[3:6] = np.array([15, 0, 0]) + 10.0*np.random.randn(3)
         
         self.eom = NewEOM.eom(dt, end, initialState)
-        self.aero = Aerodynamics.Aerodynamics()
+        #self.aero = Aerodynamics.Aerodynamics()
+        self.aero = AeroSurface.AeroSurface()
         self.prop = Propulsion.Propulsion()
         self.throttle = 0.25
         self.Vset = 15
@@ -52,6 +54,7 @@ class Vehicle:
         
         self.autothrottle(Vb)
         self.autopilot(Vb)
+        #self.throttle = 0.0
         
         f_aero = self.aero.getForces(rho, Vb)
         f_prop = self.prop.getForces(rho, V, self.throttle)

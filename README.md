@@ -97,7 +97,7 @@ Vehicle Components
 		- LORAN
 
 Simulation Components
-- Gravity Model (80%) [Spherical only, atm]
+- Gravity Model (80%) [Spherical only]
 - Atmosphere (DONE) [US76 + extended above 200 km]
 - Terrain and Collision
 - Winds
